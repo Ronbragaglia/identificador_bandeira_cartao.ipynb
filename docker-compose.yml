@@ -1,0 +1,74 @@
+# Docker Compose para Card Brand Identifier
+
+version: '3.8'
+
+services:
+  # Serviço principal
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: card-brand-identifier:latest
+    container_name: card-identifier-app
+    command: python -m card_brand_identifier.cli --help
+    volumes:
+      - ./src:/app/src
+      - ./tests:/app/tests
+      - ./examples:/app/examples
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - card-identifier-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import card_brand_identifier; print('OK')"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    restart: unless-stopped
+
+  # Serviço de testes
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: card-brand-identifier:latest
+    container_name: card-identifier-tests
+    command: pytest tests/ -v --cov=src --cov-report=term-missing
+    volumes:
+      - ./src:/app/src
+      - ./tests:/app/tests
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - card-identifier-network
+    profiles:
+      - tests
+
+  # Serviço de exemplos
+  examples:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: card-brand-identifier:latest
+    container_name: card-identifier-examples
+    command: python examples/basic_usage.py
+    volumes:
+      - ./src:/app/src
+      - ./examples:/app/examples
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - card-identifier-network
+    profiles:
+      - examples
+
+networks:
+  card-identifier-network:
+    driver: bridge
+    name: card-identifier-network
+
+volumes:
+  src:
+  tests:
+  examples:

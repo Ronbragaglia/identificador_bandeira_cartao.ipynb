@@ -1,0 +1,89 @@
+# Configuração do pre-commit para o Card Brand Identifier
+
+repos:
+  # Geral
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-json
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: debug-statements
+      - id: detect-private-key
+
+  # Black - Formatação de código
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
+    hooks:
+      - id: black
+        language_version: python3.11
+        args: ['--line-length=100']
+
+  # isort - Ordenação de imports
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: ['--profile=black', '--line-length=100']
+
+  # Flake8 - Linting
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        args: ['--max-line-length=100', '--extend-ignore=E203,W503']
+
+  # MyPy - Verificação de tipos
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+        additional_dependencies: [types-all]
+        args: ['--ignore-missing-imports', '--strict-optional']
+        exclude: ^(tests/|examples/)
+
+  # Bandit - Verificação de segurança
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.6
+    hooks:
+      - id: bandit
+        args: ['-ll']
+        files: ^src/
+
+  # Pytest - Verificação de testes
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: pytest
+        language: system
+        pass_filenames: false
+        always_run: true
+        args: ['tests/', '-v', '--tb=short']
+
+# Configuração global
+default_language_version:
+  python: python3.11
+
+# Exclusões
+exclude: |
+  (?x)^(
+      \.git/|
+      \.venv/|
+      \.mypy_cache/|
+      \.pytest_cache/|
+      build/|
+      dist/|
+      \.eggs/|
+      \.tox/|
+      __pycache__/|
+      .*\.egg-info/|
+      .*\.pyc
+  )
