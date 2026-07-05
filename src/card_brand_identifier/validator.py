@@ -28,8 +28,8 @@ def luhn_check(number: str) -> bool:
         >>> luhn_check("4111111111111112")
         False
     """
-    # Remove caracteres não numéricos
-    num = re.sub(r"\D", "", number)
+    # Remove caracteres não numéricos (trata None/entrada vazia)
+    num = re.sub(r"\D", "", number or "")
     if not num:
         return False
 
@@ -158,7 +158,7 @@ def describe_result(info: CardInfo) -> str:
         'Bandeira: visa | Luhn: válido | Dígitos: 16 | Número: 4111111111111111'
     """
     if not info.normalized:
-        return "Entrada vazia/sem dígitos."
+        return "Bandeira: indeterminada | Entrada vazia/sem dígitos."
 
     if info.brand and info.valid_luhn:
         return f"Bandeira: {info.brand} | Luhn: válido | Dígitos: {info.length} | Número: {info.normalized}"
