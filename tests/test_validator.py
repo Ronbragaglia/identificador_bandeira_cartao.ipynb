@@ -78,8 +78,8 @@ class TestLuhnCheck:
         assert not luhn_check(None)
 
     def test_single_digit(self):
-        """Testa número com um dígito."""
-        assert not luhn_check("0")
+        """Testa número com um dígito (não passa em Luhn)."""
+        assert not luhn_check("1")
 
     def test_zero(self):
         """Testa zero."""
